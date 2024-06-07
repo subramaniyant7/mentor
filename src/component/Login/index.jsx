@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { emailPattern } from "../../utils/InputRules";
 import LogoSlide from "../LogoSlide";
+import { LoginFields } from "../../utils/loginFields";
 
 export const Login = () => {
   const [remeberPassword, setRememberPassword] = useState(false);
@@ -14,9 +14,11 @@ export const Login = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
     const { useremail, userpassword } = data;
-    if (useremail !== "" && userpassword !== "") navigate("/dashboard");
+    if (useremail !== "" && userpassword !== "") {
+      console.log('Login Data',data);
+      navigate("/dashboard");
+    }
   };
 
   const handleRemeberPassword = () => setRememberPassword(!remeberPassword);
@@ -27,7 +29,7 @@ export const Login = () => {
         <div className="w-full">
           <div className="block bg-white shadow-lg h-full">
             <div className="g-0 lg:flex lg:flex-row h-full">
-             <LogoSlide />
+              <LogoSlide />
 
               <div className="px-4 md:px-0 lg:w-6/12 text-black">
                 <div className="md:mx-6 md:p-12">
@@ -107,47 +109,32 @@ export const Login = () => {
                       </p>
                     </div>
 
-                    <div className="relative mb-6">
-                      <input
-                        type="text"
-                        className="w-full rounded px-3 py-[0.32rem] leading-[2.15]"
-                        placeholder="Enter your email"
-                        style={{
-                          color: "#232323",
-                          border: "1px solid #3E3E3E",
-                        }}
-                        {...register("useremail", {
-                          required: true,
-                          pattern: emailPattern,
-                        })}
-                        aria-invalid={errors.useremail ? "true" : "false"}
-                      />
-                      {errors.useremail?.type === "required" && (
-                        <p className="error" role="alert">
-                          Email is required
-                        </p>
-                      )}
-                    </div>
+                    {
+                      LoginFields.map((fields, index) =>
 
-                    <div className="relative mb-6" data-twe-input-wrapper-init>
-                      <input
-                        type="password"
-                        className="w-full rounded px-3 py-[0.32rem] leading-[2.15]"
-                        id="exampleFormControlInput22"
-                        placeholder="Enter your password"
-                        style={{
-                          color: "#232323",
-                          border: "1px solid #3E3E3E",
-                        }}
-                        {...register("userpassword", { required: true })}
-                        aria-invalid={errors.userpassword ? "true" : "false"}
-                      />
-                      {errors.userpassword?.type === "required" && (
-                        <p className="error" role="alert">
-                          Password is required
-                        </p>
-                      )}
-                    </div>
+                        <div className="relative mb-6" key={index}>
+                          <label className="block tracking-wide text-gray-700 text-xs font-bold mb-2">
+                            {fields.label}
+                          </label>
+                          <input
+                            type={fields.fieldtype}
+                            className={`w-full rounded px-3 py-[0.32rem] leading-[2.15] ${errors[fields.name] ? 'focus:border-teal focus:outline-none focus:ring-0' : ''}`}
+                            placeholder={fields.placeholder}
+                            style={{
+                              color: "#232323",
+                              border: `1px solid ${errors[fields.name] ? 'rgb(239 68 68)' : '#3E3E3E'}`,
+                            }}
+                            {...register(fields.name, fields.inputRules)}
+                            aria-invalid={errors[fields.name] ? "true" : "false"}
+                          />
+                          {errors[fields.name] && (
+                            <p className="error" role="alert">
+                              {errors[fields.name].message}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    }
 
                     <div className="mb-6 flex items-center justify-between">
                       <div className="mb-[0.125rem] block min-h-[1.5rem] ps-[1.5rem]">

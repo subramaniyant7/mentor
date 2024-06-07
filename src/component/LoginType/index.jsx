@@ -1,17 +1,29 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUserInfo } from "../../features/user/userSlice";
 
 export const LoginType = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const userInfo = useSelector(state => state.userInfo);
     const [loginType, setLoginType] = useState('');
     const [error, setError] = useState(false)
 
+
+    useEffect(() => {
+        if (userInfo.login_type) setLoginType(userInfo.login_type)
+    }, [userInfo]);
+
     const handleSubmit = () => {
         if (loginType === '') setError(true)
-        if(loginType !== '') {
+        if (loginType !== '') {
             setError(false)
             console.log(loginType);
+            dispatch(updateUserInfo({ login_type: loginType }))
+            navigate("/questions");
         }
-        
+
     };
 
     console.log('loginType', loginType, error)
@@ -59,8 +71,8 @@ export const LoginType = () => {
                                                 <div className="relative mb-6">
                                                     <div>
                                                         <label className={`flex flex-row p-10 cursor-pointer ${loginType === 'mentor' ? "activeTypeBg" : "nonActiveTypeBg"}`}
-                                                            >
-                                                            <input type="radio" name="radio" checked={loginType === 'mentor'} onChange={() => setLoginType('mentor')}  />
+                                                        >
+                                                            <input type="radio" name="radio" checked={loginType === 'mentor'} onChange={() => setLoginType('mentor')} />
                                                             <span className="font-semibold text-base pl-2">Mentor</span>
 
                                                         </label>
@@ -70,7 +82,7 @@ export const LoginType = () => {
                                                 <div className="relative mb-6">
                                                     <div>
                                                         <label className={`flex flex-row p-10 cursor-pointer ${loginType === 'mentee' ? "activeTypeBg" : "nonActiveTypeBg"}`}
-                                                            >
+                                                        >
                                                             <input type="radio" name="radio" checked={loginType === 'mentee'} onChange={() => setLoginType('mentee')} />
                                                             <span className="font-semibold text-base pl-2">Mentee</span>
 

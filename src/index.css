@@ -37,6 +37,14 @@ body {
   color: #000;
 }
 
+.form-container{
+  padding: 26px 70px;
+}
+
+.input-bg {
+  background: rgba(29, 91, 191, 0.05);
+}
+
 /* Stepper */
 .stepNumberBg {
   background-color: rgb(217, 228, 242);

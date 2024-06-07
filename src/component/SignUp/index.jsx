@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { emailPattern } from "../../utils/InputRules";
+import { useDispatch } from "react-redux";
+import { SignupFields } from "../../utils/loginFields";
 import LogoSlide from "../LogoSlide";
+import { setUserInfo } from '../../features/user/userSlice'
 
 export const Signup = () => {
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -16,11 +18,14 @@ export const Signup = () => {
   const onSubmit = (data) => {
     console.log(data);
     const { userfullname, useremail, userpassword } = data;
-    if (userfullname !== "" && useremail !== "" && userpassword !== "")
-      navigate("/dashboard");
+    if (userfullname !== "" && useremail !== "" && userpassword !== ""){
+      dispatch(setUserInfo(data))
+      navigate("/login-type");
+    }
   };
 
-  const handleAgreeTerms = () => setAgreeTerms(!agreeTerms);
+
+  console.log('errors', errors)
 
   return (
     <div className="h-full">
@@ -108,81 +113,52 @@ export const Signup = () => {
                       </p>
                     </div>
 
-                    <div className="relative mb-6">
-                      <input
-                        type="text"
-                        className="w-full rounded px-3 py-[0.32rem] leading-[2.15]"
-                        placeholder="Enter your fullname"
-                        style={{
-                          color: "#232323",
-                          border: "1px solid #3E3E3E",
-                        }}
-                        {...register("userfullname", { required: true })}
-                        aria-invalid={errors.userfullname ? "true" : "false"}
-                      />
-                      {errors.userfullname?.type === "required" && (
-                        <p className="error" role="alert">
-                          Fullname is required
-                        </p>
-                      )}
-                    </div>
+                    {
+                      SignupFields.map((fields, index) =>
 
-                    <div className="relative mb-6">
-                      <input
-                        type="text"
-                        className="w-full rounded px-3 py-[0.32rem] leading-[2.15]"
-                        placeholder="Enter your email"
-                        style={{
-                          color: "#232323",
-                          border: "1px solid #3E3E3E",
-                        }}
-                        {...register("useremail", {
-                          required: true,
-                          pattern: emailPattern,
-                        })}
-                        aria-invalid={errors.useremail ? "true" : "false"}
-                      />
-                      {errors.useremail?.type === "required" && (
-                        <p className="error" role="alert">
-                          Email is required
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="relative mb-6" data-twe-input-wrapper-init>
-                      <input
-                        type="password"
-                        className="w-full rounded px-3 py-[0.32rem] leading-[2.15]"
-                        id="exampleFormControlInput22"
-                        placeholder="Enter your password"
-                        style={{
-                          color: "#232323",
-                          border: "1px solid #3E3E3E",
-                        }}
-                        {...register("userpassword", { required: true })}
-                        aria-invalid={errors.userpassword ? "true" : "false"}
-                      />
-                      {errors.userpassword?.type === "required" && (
-                        <p className="error" role="alert">
-                          Password is required
-                        </p>
-                      )}
-                    </div>
-
+                        <div className="relative mb-6" key={index}>
+                          <label className="block tracking-wide text-gray-700 text-xs font-bold mb-2">
+                            {fields.label}
+                          </label>
+                          <input
+                            type={fields.fieldtype}
+                            className={`w-full rounded px-3 py-[0.32rem] leading-[2.15] ${errors[fields.name] ? 'focus:border-teal focus:outline-none focus:ring-0' : ''}`}
+                            placeholder={fields.placeholder}
+                            style={{
+                              color: "#232323",
+                              border: `1px solid ${errors[fields.name] ? 'rgb(239 68 68)' : '#3E3E3E'}`,
+                            }}
+                            {...register(fields.name, fields.inputRules)}
+                            aria-invalid={errors[fields.name] ? "true" : "false"}
+                          />
+                          {errors[fields.name] && (
+                            <p className="error" role="alert">
+                              {errors[fields.name].message}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    }
                     <div className="mb-6 flex items-center justify-between">
                       <div className="mb-[0.125rem] block min-h-[1.5rem] ps-[1.5rem]">
                         <input
                           className="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]"
                           type="checkbox"
-                          value={agreeTerms}
-                          checked={agreeTerms}
-                          onChange={handleAgreeTerms}
+                          {
+                          ...register("agree_terms", { required: true })
+                          }
                         />
                         <label className="inline-block ps-[0.15rem] hover:cursor-pointer defaultTextColor">
                           I agree to the Terms of Service and Privacy Policy
                         </label>
                       </div>
+                      {errors['agree_terms'] && (
+                      <p className="error" role="alert">
+                        Please agree terms
+                      </p>
+                    )}
                     </div>
+                    
 
                     <div className="text-center lg:text-left">
                       <button
